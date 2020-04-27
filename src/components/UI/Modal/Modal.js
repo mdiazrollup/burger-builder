@@ -6,7 +6,7 @@ import Backdrop from '../../../components/UI/Backdrop/Backdrop';
 class Modal extends Component {
 	// To not re render modal and children when it is not shown
 	shouldComponentUpdate(nextProps, nextState) {
-		return nextProps.show !== this.props.show;
+		return nextProps.show !== this.props.show || nextProps.children !== this.props.children;
 	}
 
 	componentDidUpdate() {
