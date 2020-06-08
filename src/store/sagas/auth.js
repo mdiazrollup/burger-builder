@@ -1,4 +1,4 @@
-import {put} from 'redux-saga/effects';
+import {put, call} from 'redux-saga/effects';
 import * as actions from '../actions/index';
 import {delay} from 'redux-saga/effects';
 import axios from 'axios';
@@ -6,9 +6,9 @@ import axios from 'axios';
 //Saga generators 
 
 export function* logoutSaga(action) { // generators in javascript
-    yield localStorage.removeItem('token');
-	yield localStorage.removeItem('expirationTime');
-    yield localStorage.removeItem('userId');
+    yield call([localStorage, 'removeItem'], 'token');
+    yield call([localStorage, 'removeItem'], 'expirationTime');
+    yield call([localStorage, 'removeItem'], 'userId');
     yield put(actions.logoutSucceed());
 }
 
