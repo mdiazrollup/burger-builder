@@ -1,48 +1,43 @@
-import React, {Component} from "react";
+import React, {useState, useEffect} from "react";
 import Modal from '../../components/UI/Modal/Modal';
 import Aux from '../Aux/Aux';
 
 const withErrorHandler = (WrappedComponent, axios) => {
-	return class extends Component {
-		state = {
-			error: null
+	return props => {
+		const [error, setError] = useState(null);
+
+		const reqInterceptor = axios.interceptors.request.use(req => {
+			setError(null);
+			return req;
+		});
+
+		const respInterceptor = axios.interceptors.response.use(resp => resp, err => {
+			setError(err);
+		});
+
+		useEffect(() => {
+			return() => {
+				//Remove interceptor when WrappedComponent is destroy
+				// To prevent memory leak
+				axios.interceptors.request.eject(reqInterceptor);
+				axios.interceptors.request.eject(respInterceptor);
+			};
+		}, [reqInterceptor,respInterceptor]);
+
+		const errorConfirmHandler = () => {
+			setError(null);
 		}
 
-
-		componentWillMount() { //Because this method will disappear set the interceptor in the constructor
-			this.reqInterceptor = axios.interceptors.request.use(req => {
-				this.setState({error: null});
-				return req;
-			});
-
-			this.respInterceptor = axios.interceptors.response.use(resp => resp, error => {
-				this.setState({error: error});
-			});
-		}
-
-		componentWillUnmount() {
-			//Remove interceptor when WrappedComponent is destroy
-			// To prevent memory leak
-			axios.interceptors.request.eject(this.reqInterceptor);
-			axios.interceptors.request.eject(this.respInterceptor);
-		}
-
-		errorConfirmHandler = () => {
-			this.setState({error: null});
-		}
-
-		render() {
-			return (
-				<Aux>
-					<Modal 
-						show={this.state.error}
-						modalClosed={this.errorConfirmHandler}>
-						{this.state.error ? this.state.error.message : null}
-					</Modal>
-					<WrappedComponent {...this.props}/>
-				</Aux>
-			);
-		}
+		return (
+			<Aux>
+				<Modal 
+					show={error}
+					modalClosed={errorConfirmHandler}>
+					{error ? error.message : null}
+				</Modal>
+				<WrappedComponent {...props}/>
+			</Aux>
+		);
 	}
 }
 
