@@ -19,9 +19,11 @@ const Auth = React.lazy(() => {
 });
 
 const app = props => {
+  const {onTryAutoSignup} = props;
+
   useEffect(() => {
-    props.onTryAutoSignup();
-  }, []);
+    onTryAutoSignup();
+  }, [onTryAutoSignup]); //Only when mount if []. if not when variable change
 
     let routes = (
       <Switch>
